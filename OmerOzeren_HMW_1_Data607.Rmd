@@ -1,0 +1,62 @@
+---
+title: "omerozeren_HMW_1_Data607"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r}
+library(ggplot2)
+library(knitr)
+download.file('https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data', 'agaricus-lepiota.data')
+df <- read.table('agaricus-lepiota.data', sep=',', stringsAsFactors=FALSE)
+```
+
+#### Original Mushroom Data:
+
+```{r}
+head(df)
+```
+#### creating sunset of original data
+
+```{r}
+df_subset <- subset(df,select=c(V1,V2,V3,V4,V23))
+colnames(df_subset)<-c("toxicity","cap_shape","cap_surface","cap_color","habitat")
+head(df_subset)
+```
+
+```{r}
+df_subset[which(df_subset$toxicity=="e"),1] <- "edible"
+df_subset[which(df_subset$toxicity=="p"),1] <- "poisonous"
+df_subset[which(df_subset$cap_color=="n"),4] <- "brown"
+df_subset[which(df_subset$cap_color=="g"),4] <- "gray"
+df_subset[which(df_subset$cap_color=="e"),4] <- "red"
+df_subset[which(df_subset$cap_color=="y"),4] <- "yellow"
+df_subset[which(df_subset$cap_color=="w"),4] <- "white"
+df_subset[which(df_subset$cap_color=="b"),4] <- "bluw"
+df_subset[which(df_subset$cap_color=="p"),4] <- "pink"
+df_subset[which(df_subset$cap_shape=="b"),2] <- "bell"
+df_subset[which(df_subset$cap_shape=="c"),2] <- "conical"
+df_subset[which(df_subset$cap_shape=="f"),2] <- "flat"
+df_subset[which(df_subset$cap_shape=="k"),2] <- "knobbed"
+df_subset[which(df_subset$cap_shape=="s"),2] <- "sunken"
+df_subset[which(df_subset$cap_shape=="x"),2] <- "convex"
+df_subset[which(df_subset$cap_surface=="f"),3] <- "fibrous"
+df_subset[which(df_subset$cap_surface=="g"),3] <- "grooves"
+df_subset[which(df_subset$cap_surface=="s"),3] <- "scaly"
+df_subset[which(df_subset$cap_surface=="y"),3] <- "smooth"
+df_subset[which(df_subset$habitat=="g"),5] <- "grasses"
+df_subset[which(df_subset$habitat=="l"),5] <- "leaves"
+df_subset[which(df_subset$habitat=="m"),5] <- "meadows"
+df_subset[which(df_subset$habitat=="p"),5] <- "paths"
+df_subset[which(df_subset$habitat=="u"),5] <- "urban"
+df_subset[which(df_subset$habitat=="w"),5] <- "waste"
+df_subset[which(df_subset$habitat=="d"),5] <- "woods"
+head(df_subset)
+```
+
+####SUMMARY OF DATAFRAME 
+
+```{r}
+summary(df_subset)
+```
