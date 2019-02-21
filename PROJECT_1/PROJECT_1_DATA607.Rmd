@@ -1,0 +1,38 @@
+---
+title: "PROJECT_1_DATA607"
+author: "OMER OZEREN"
+output: html_document
+---
+```{r setup, include=FALSE}
+library(tidyverse)
+library(stringr)
+```
+
+## Text File
+
+
+```{r load file, warning=FALSE, message=FALSE}
+raw_data <- read_table("tournamentinfo.txt",col_names="txt")
+```
+
+```{r}
+table(raw_data)
+```
+
+```{r extract-names,warning=FALSE, message=FALSE}
+names <- unlist(str_extract_all(raw_data, "[A-Z]+ [A-Z]+ ([A-Z-]+)? ([A-Z]+)?"))
+```
+
+```{r names}
+names
+```
+
+```{r,warning=FALSE, message=FALSE}
+states <- unlist(str_extract_all(raw_data, "[[:upper:]]. \\|"))
+states <- str_replace_all(states, " \\|", "")
+points <- as.numeric(unlist(str_extract_all(raw_data, "(\\d)\\.(\\d)")))
+prerating <- unlist(str_extract_all(raw_data, "R:\\s+?(\\d)+"))
+prerating <- str_replace_all(prerating, "R:\\s+", "")
+prerating <- as.numeric(prerating)
+points
+```
