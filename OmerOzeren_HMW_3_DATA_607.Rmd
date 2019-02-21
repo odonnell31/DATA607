@@ -1,0 +1,118 @@
+---
+title: "OmerOzeren_HMW_2_DATA_607"
+output:
+  html_document: default
+  word_document: default
+---
+
+### 3) Copy the introductory example. The vector name stores the extracted names 
+```{r}
+library(stringr)
+raw.data <-"555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5553642Dr. Julius Hibbert"
+names <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
+names
+```
+
+**3.1 Use the tools of this chapter to rearrange the vector so that all the elements conform to the standard first_name last_name format.** 
+ 
+In order to get standart first name ,last name we need to remove middle names and titles 
+
+**remove middle names : **
+```{r}
+names_no_middle_name <- sub(" [A-z]{1}\\. ","",names)
+names_no_middle_name
+```
+
+**remove titles from the names :**
+```{r}
+names_final <- sub("[A-z]{2,3}\\. ","",names_no_middle_name)
+names_final
+```
+
+**DataFrame **
+```{r}
+df.names <- data.frame(names_final)
+df.names
+```
+
+**3.2 Construct a logical vector indicating whether a character has a title** 
+
+```{r}
+#Recall the original sample 'name2' from part a
+titles <- str_detect(names_no_middle_name, "[[:alpha:]]{2,}\\.")
+titles
+```
+
+```{r}
+df.titles<- data.frame(names,titles)
+df.titles
+```
+
+**3.3 Contruct a logical vector that indicates if a character has a second name**
+
+```{r}
+secondname <- str_detect(names, "[A-Z]\\.{1}")
+df.secondname <- data.frame(names,secondname)
+df.secondname
+```
+### 4) Describe the types of strings that conform to the following regular expressions and construct an example that is matched by regular expression
+**4.1**
+ [0-9]+\$
+
+**Any numbers 0-9 zero or more followed by the dollar $  string**
+```{r}
+sample <- c("5748900000$","omer35$", "38$","38")  
+expression = "[0-9]+\\$"
+str_detect(sample, expression)
+```
+
+**4.2** 
+  \\b[a-z{1,4}]\\b
+
+**Any word that has anywhere between 1 to 4 letters** 
+```{r}
+sample_2 <- c("car","cats","door", "hi", "datascience")
+expression_2 <-"\\b[a-z]{1,4}\\b"
+str_detect(sample_2, expression_2)
+```
+
+**4.3**
+  .*?\\.txt$
+
+**Any string that ends with a .txt** 
+```{r}
+sample_3 <- c("cars.txt", "txt", "timeseries.txt","code3434.txt")
+expression_3 <-".*?\\.txt$"
+str_detect(sample_3, expression_3)
+```
+
+**4.4**
+  \\d{2}/\\d{2}/\\d{4}
+
+**Any Numbers that are written in format dd/dd/dddd** 
+```{r}
+sample_4 <- c("100/1000/10000", "02/12/2019", "2/12/2019")
+expression_4 <-"\\d{2}/\\d{2}/\\d{4}"
+str_detect(sample_4, expression_4)
+```
+
+**4.5**
+  <(.+?)>.+?</\\1>
+
+**Text that starts and ends <> with and also  at the end string starts with "/"" ** 
+```{r}
+sample_5 <- c("<omer>hello</omer>", "<omer>hello<omer>")
+expression_5 <-"<(.+?)>.+?</\\1>"
+str_detect(sample_5, expression_5)
+```
+
+### 9) Extra Credit-The following code hides a secret message. Crack it with R and regular expressions.
+
+```{r}
+code <-"clcopCow1zmstc0d87wnkig7OvdicpNuggvhryn92Gjuwczi8hqrfpRxs5Aj5dwpn0TanwoUwisdij7Lj8kpf03AT5Idr3coc0bt7yczjatOaootj55t3Nj3ne6c4Sfek.r1w1YwwojigOd6vrfUrbz2.2bkAnbhzgv4R9i05zEcrop.wAgnb.SqoU65fPa1otfb7wEm24k6t3sR9zqe5fy89n6Nd5t9kc4fE905gmc4Rgxo5nhDk!gr"
+code
+```
+
+```{r}
+#Find all uppercase letters
+str_extract_all(code, "[[:upper:]]")

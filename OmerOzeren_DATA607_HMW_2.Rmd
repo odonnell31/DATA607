@@ -1,0 +1,47 @@
+---
+title: "Omer_Ozeren_data607-HMW2"
+output: html_document
+---
+
+```{r}
+library(RMySQL)
+```
+
+Connect the Database
+```{r}
+mydb = dbConnect(MySQL(), user='root', password='MelekOmer2016', dbname='movies_rating', host='localhost')
+```
+
+The names of the tables currently existing in this schema "movies_rating" 
+
+```{r, eval=FALSE, include=FALSE}
+dbListTables(mydb)
+```
+
+We can pick any table in this database and look at the particular fields 
+```{r}
+dbListFields(mydb, 'movie_ratings')
+```
+
+```{r}
+data<-dbGetQuery(mydb, 'select 
+a.person_id, 
+a.person_name, 
+b.movie_name, 
+c.rating  
+from viewers a  
+left join reviews c  
+on (a.person_id=c.person_id)
+left join movies b
+on (b.movie_id=c.movie_id)
+order by c.rating desc;')
+```
+
+```{r}
+df.movies <- data
+head(data)
+```
+
+```{r summary }
+ summary(data)
+```

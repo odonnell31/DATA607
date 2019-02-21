@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/467924/90dc85a7909740e796c8f78d8bb6b40f
+bundleId: https://api.rpubs.com/api/v1/document/467924/90dc85a7909740e796c8f78d8bb6b40f
+url: http://rpubs.com/omerozeren/467924
+when: 1550274702.17692
