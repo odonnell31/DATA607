@@ -1,38 +1,99 @@
 ---
-title: "PROJECT_1_DATA607"
+title: "PROJECT 1 DATA607"
 author: "OMER OZEREN"
-output: html_document
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
 ---
-```{r setup, include=FALSE}
+
+```{r ,include=FALSE}
 library(tidyverse)
 library(stringr)
 ```
 
-## Text File
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Get Data from Github
 
 
 ```{r load file, warning=FALSE, message=FALSE}
-raw_data <- read_table("tournamentinfo.txt",col_names="txt")
+raw_data <- read.csv(paste0("https://raw.githubusercontent.com/omerozeren/DATA607/master/PROJECT_1/tournamentinfo.txt"))
+head(raw_data)
 ```
 
+### Removing Column Headers
 ```{r}
-table(raw_data)
+raw_data <- raw_data[-c(1:2),]
+head(raw_data,6)
 ```
 
-```{r extract-names,warning=FALSE, message=FALSE}
-names <- unlist(str_extract_all(raw_data, "[A-Z]+ [A-Z]+ ([A-Z-]+)? ([A-Z]+)?"))
+### Cleaning the Data
+```{r}
+clean_data =raw_data[seq(2,length(raw_data),3)]
+knitr::kable(head(clean_data,5), digits=2, align=c(rep("l", 4) ) )
 ```
 
-```{r names}
+### Players ID
+```{r,warning=FALSE, message=FALSE}
+id <-  as.numeric(str_extract(substr(unlist(clean_data),1,length(raw_data)),"\\d+"))
+id
+```
+
+### Player Names
+```{r,warning=FALSE, message=FALSE}
+names <- str_trim(unlist(str_extract_all(raw_data, "[A-Z]+ [A-Z]+ ([A-Z-]+)? ([A-Z]+)?")))
 names
 ```
 
+
+### Player States
 ```{r,warning=FALSE, message=FALSE}
-states <- unlist(str_extract_all(raw_data, "[[:upper:]]. \\|"))
-states <- str_replace_all(states, " \\|", "")
+region <- unlist(str_extract_all(raw_data, "[[:upper:]]. \\|"))
+region <- str_trim(str_replace_all(region, " \\|", ""))
+region
+```
+
+### Player Points
+```{r,warning=FALSE, message=FALSE}
 points <- as.numeric(unlist(str_extract_all(raw_data, "(\\d)\\.(\\d)")))
-prerating <- unlist(str_extract_all(raw_data, "R:\\s+?(\\d)+"))
-prerating <- str_replace_all(prerating, "R:\\s+", "")
-prerating <- as.numeric(prerating)
 points
+```
+
+
+### Player Pre Ratings 
+```{r,warning=FALSE, message=FALSE}
+pre_rating  <- unlist(str_extract_all(raw_data, "R:\\s+?(\\d)+"))
+pre_rating  <- str_replace_all(pre_rating , "R:\\s+", "")
+pre_rating  <- as.integer(pre_rating )
+pre_rating
+```
+
+### Player Opponents 
+```{r,warning=FALSE, message=FALSE}
+opponents <- str_extract_all(str_extract_all(clean_data, "\\d+\\|"), "\\d+")
+head(opponents,5)
+```
+
+### Create DataFrame
+```{r}
+df <- data.frame(id, names, region, points, pre_rating)
+colnames(df)<- c("Player Number","Player Names","Player State","Total Points","Pre Rating")
+df[,"Average_Pre_Chess_Rating"] <- NA
+```
+
+```{r}
+for (i in 1:nrow(df)){ 
+  df$Average_Pre_Chess_Rating[i] <- round(mean(pre_rating[as.integer(unlist(opponents[id[i]]))]), digits = 0)
+}
+knitr::kable(df, digits=2, align=c(rep("l", 4) ) )
+```
+
+### Writing results in csv file
+```{r}
+write.csv(df, file = "tournament_results.csv")
 ```
