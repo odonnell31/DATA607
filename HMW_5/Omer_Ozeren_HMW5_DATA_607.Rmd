@@ -1,0 +1,46 @@
+---
+title: "HomeWork 5"
+output: html_document
+---
+
+(1) Create a **.CSV** file (or optionally, a **MySQL** database!) that includes all of the information above.  
+You're encouraged to use a "wide" structure similar to how the information appears above, so
+that you can practice tidying and transformations as described below.
+
+(2) Read the information from your **.CSV** file into **R**, and use **tidyr** and **dplyr** as needed to tidy 
+and transform your data.
+
+(3) Perform analysis to compare the arrival delays for the two airlines.
+
+(4) Your code should be in an R Markdown file, posted to rpubs.com, and should include narrative 
+descriptions of your data cleanup work, analysis, and conclusions. Please include in your 
+homework submission:
+
+The URL to the **.Rmd** file in your GitHub repository and The URL for your **rpubs.com** web page.
+
+# PROCEDURE
+
+## Library definition
+
+```{r library_setups, warning=FALSE, error=FALSE, cache=FALSE, results='hide', message=FALSE}
+library(stringr)
+library(tidyr)
+library(dplyr)
+```
+
+
+## (1) Read information from **.CSV** file into R.
+
+For simplicity and reproducibility reasons, I have posted this file on my GitHub repository as follows:
+
+### GitHub URL
+
+```{r}
+url <- "https://raw.githubusercontent.com/omerozeren/DATA607/master/HMW_5/airlines.csv"
+```
+
+```{r}
+raw_data <- read.csv(url, header=FALSE, sep=",", stringsAsFactors=FALSE)
+raw_data <- data.frame(raw_data)
+raw_data
+```
