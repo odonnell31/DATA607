@@ -202,7 +202,8 @@ You’re encouraged to use a “wide” structure similar to how the information
 <h2>Library definition</h2>
 <pre class="r"><code>library(stringr)
 library(tidyr)
-library(dplyr)</code></pre>
+library(dplyr)
+library(knitr)</code></pre>
 </div>
 <div id="read-information-from-.csv-file-into-r." class="section level2">
 <h2>(1) Read information from <strong>.CSV</strong> file into R.</h2>
@@ -213,13 +214,91 @@ library(dplyr)</code></pre>
 <pre class="r"><code>raw_data &lt;- read.csv(url, header=FALSE, sep=&quot;,&quot;, stringsAsFactors=FALSE)
 raw_data &lt;- data.frame(raw_data)
 raw_data</code></pre>
-<pre><code>##   V1          V2      V3        V4            V5     V6  V7   V8
-## 1 NA Los Angeles Phoenix San Diego San Francisco Seatle  NA   NA
-## 2 NA      ALASKA on time       497           221    212 503 1841
-## 3 NA             delayed        62            12     20 102  305
-## 4 NA                                                     NA   NA
-## 5 NA     AM WEST on time       694          4840    383 320  201
-## 6 NA             delayed       117           415     65 129   61</code></pre>
+<pre><code>##            V1      V2        V3            V4     V5  V6   V7
+## 1 Los Angeles Phoenix San Diego San Francisco Seatle  NA   NA
+## 2      ALASKA on time       497           221    212 503 1841
+## 3             delayed        62            12     20 102  305
+## 4                                                     NA   NA
+## 5     AM WEST on time       694          4840    383 320  201
+## 6             delayed       117           415     65 129   61</code></pre>
+<div id="renaming-column-headers" class="section level4">
+<h4>Renaming Column headers</h4>
+<pre class="r"><code># Adding &quot;Missing&quot; titles from original file onto the Row #1
+raw_data$V1[1] &lt;- &quot;Airline&quot;
+raw_data$V2[1] &lt;- &quot;Status&quot;
+# Need to eliminate Row #1 in order to keep data consistency.
+#raw_data &lt;-raw_data[-c(1), ]</code></pre>
+<p>Table displaying correct column titles.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">V1</th>
+<th align="left">V2</th>
+<th align="left">V3</th>
+<th align="left">V4</th>
+<th align="left">V5</th>
+<th align="right">V6</th>
+<th align="right">V7</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Airline</td>
+<td align="left">Status</td>
+<td align="left">San Diego</td>
+<td align="left">San Francisco</td>
+<td align="left">Seatle</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">ALASKA</td>
+<td align="left">on time</td>
+<td align="left">497</td>
+<td align="left">221</td>
+<td align="left">212</td>
+<td align="right">503</td>
+<td align="right">1841</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">delayed</td>
+<td align="left">62</td>
+<td align="left">12</td>
+<td align="left">20</td>
+<td align="right">102</td>
+<td align="right">305</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">AM WEST</td>
+<td align="left">on time</td>
+<td align="left">694</td>
+<td align="left">4840</td>
+<td align="left">383</td>
+<td align="right">320</td>
+<td align="right">201</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">delayed</td>
+<td align="left">117</td>
+<td align="left">415</td>
+<td align="left">65</td>
+<td align="right">129</td>
+<td align="right">61</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>

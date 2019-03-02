@@ -26,6 +26,7 @@ The URL to the **.Rmd** file in your GitHub repository and The URL for your **rp
 library(stringr)
 library(tidyr)
 library(dplyr)
+library(knitr)
 ```
 
 
@@ -44,3 +45,30 @@ raw_data <- read.csv(url, header=FALSE, sep=",", stringsAsFactors=FALSE)
 raw_data <- data.frame(raw_data)
 raw_data
 ```
+
+#### Renaming Column headers
+
+```{r}
+# Adding "Missing" titles from original file onto the Row #1
+raw_data$V1[1] <- "Airline"
+raw_data$V2[1] <- "Status"
+# Need to eliminate Row #1 in order to keep data consistency.
+#raw_data <-raw_data[-c(1), ]
+```
+
+Table  displaying correct column titles.
+
+```{r, echo=FALSE}
+kable(raw_data)
+```
+
+
+
+
+
+
+
+
+
+
+
