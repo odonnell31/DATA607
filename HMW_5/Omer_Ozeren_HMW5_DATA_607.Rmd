@@ -1,6 +1,18 @@
 ---
-title: "HomeWork 5"
-output: html_document
+title: "Homework 5"
+author: "OMER OZEREN"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    highlight: tango
+    toc_depth: 4
+  word_document:
+    toc: yes
+    highlight: tango
+    toc_depth: 4
+---
 ---
 
 (1) Create a **.CSV** file (or optionally, a **MySQL** database!) that includes all of the information above.  
@@ -18,7 +30,7 @@ homework submission:
 
 The URL to the **.Rmd** file in your GitHub repository and The URL for your **rpubs.com** web page.
 
-# PROCEDURE
+
 
 ## Library definition
 
@@ -27,14 +39,18 @@ library(stringr)
 library(tidyr)
 library(dplyr)
 library(knitr)
+library(ggplot2)
 ```
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ## (1) Read information from **.CSV** file into R.
 
 For simplicity and reproducibility reasons, I have posted this file on my GitHub repository as follows:
 
-### GitHub URL
+**GitHub URL**
 
 ```{r}
 url <- "https://raw.githubusercontent.com/omerozeren/DATA607/master/HMW_5/airlines.csv"
@@ -46,14 +62,16 @@ raw_data <- data.frame(raw_data)
 raw_data
 ```
 
-#### Renaming Column headers
+## (2) Renaming Column headers
 
 ```{r}
 # Adding "Missing" titles from original file onto the Row #1
 raw_data$V1[1] <- "Airline"
 raw_data$V2[1] <- "Status"
+# Assigning all the values from the row #1 as the Column Headers
+names(raw_data) <- raw_data[1,]
 # Need to eliminate Row #1 in order to keep data consistency.
-#raw_data <-raw_data[-c(1), ]
+raw_data <-raw_data[-c(1), ]
 ```
 
 Table  displaying correct column titles.
@@ -62,13 +80,173 @@ Table  displaying correct column titles.
 kable(raw_data)
 ```
 
+## (3) Eliminating Empty rows with **"NA"** values 
+
+For this, I have to transform our data as follows:
+
+```{r, echo=FALSE}
+# Preview of data composition before transformation
+str(raw_data)
+```
+
+Procedure to transform values into integers
+
+```{r}
+for (i in 3:dim(raw_data)[2]){
+  raw_data[,i] <- as.integer(raw_data[,i])
+}
+```
+
+Preview of data after transformation
+
+```{r, echo=FALSE}
+# Preview of data composition before transformation
+str(raw_data)
+```
+
+Procedure to eliminate all the **NA** lines from our original file by employing **drop_na()**
+
+```{r}
+raw_data <- raw_data %>% drop_na()
+```
+
+```{r, echo=FALSE}
+kable(raw_data)
+```
+
+##  (4) Adding missing Airline name to "delayed" row
+
+```{r}
+for (i in 1:dim(raw_data)[1]){
+  if (i %% 2 == 0){
+      raw_data$Airline[i] <-  raw_data$Airline[i-1]
+  }
+}
+```
+
+Final completed table in order to start employing **tidy** transformations for further analysis.
+
+```{r, echo=FALSE}
+kable(raw_data)
+```
+
+## (5) Analysis
 
 
+**First:** we need to transform our table by employing **gather()** from **tidyr** library.
+
+```{r}
+# Tidy table by having 4 variables (Airline, Status, City, number of flights)
+flight <- gather(raw_data, City, Flight_Count, 3:7)
+```
+
+```{r, echo=FALSE}
+kable((flight))
+```
+
+```{r}
+# grouping by flights
+total_A <- flight %>% group_by(Airline) %>% summarise(Total_Flights = sum(Flight_Count))
+kable(total_A)
+```
+
+#### (a) Flights Status  by airlines
 
 
+```{r}
+# Total of flights from each airline that were on time
+on_time_airline <- flight %>% group_by(Airline) %>% filter(Status == 'on time') %>% summarise(Flights_On_Time = sum(Flight_Count))
+kable(on_time_airline)
+```
 
+```{r}
+# Total of flights from each airline that were delayed.
+delayed_airline <- flight %>% group_by(Airline) %>% filter(Status == 'delayed') %>% summarise(Flights_Delayed = sum(Flight_Count))
+kable(delayed_airline)
+```
 
+**Combine delayed and on_time data sets**
+```{r}
+# Now will combine all the data set information (including new columns) into data.frame flights.summary
+flights_summary_airline <- cbind(on_time_airline, Flights_Delayed = delayed_airline$Flights_Delayed, Total_Flights = total_A$Total_Flights)
+flights_summary_airline <- flights_summary_airline %>% mutate(Percent_On_Time_airline = Flights_On_Time/Total_Flights, Percent_Delayed_airline = Flights_Delayed/Total_Flights)
 
+kable(flights_summary_airline)
+```
 
+Overall, it appears that AM_West seems to be doing slightly a better job of staying on time. And not to mention, AM West flew more flights than Alaska.
+
+Now I will create two  data.frames where one is Alaska Airlines, and the other is AM_West Airlines.
+
+```{r}
+Alaska <- flight %>% filter(Airline == 'ALASKA')
+AM_West <- flight %>% filter(Airline == 'AM WEST')
+```
+
+**Plot:**
+```{r}
+my.plot <- barplot(flights_summary_airline$Total_Flights, main="Flights by Airline", xlab="Airline", names.arg=flights_summary_airline$Airline, axes=FALSE, ylim = c(0, max(flights_summary_airline$Total_Flights)+1000))
+# Placing values on top of bars
+text(my.plot, flights_summary_airline$Total_Flights, labels = flights_summary_airline$Total_Flights, pos = 3)
+```
+
+#### (b) Flight Status by City
+
+**grouping by flights**
+```{r}
+total_C <- flight %>% group_by(City) %>% summarise(Total_Flights = sum(Flight_Count))
+kable(total_C)
+```
+
+```{r}
+# Total of flights from each airline that were on time
+on_time_city <- flight %>% group_by(City) %>% filter(Status == 'on time') %>% summarise(Flights_On_Time = sum(Flight_Count))
+kable(on_time_city)
+```
+
+```{r}
+# Total of flights from each airline that were delayed.
+delayed_city <- flight %>% group_by(City) %>% filter(Status == 'delayed') %>% summarise(Flights_Delayed = sum(Flight_Count))
+kable(delayed_city)
+```
+
+**Now will combine all the data set information (including new columns) into data.frame flights.summary**
+
+```{r}
+flights_summary_city<- cbind(on_time_city, Flights_Delayed = delayed_city$Flights_Delayed, Total_Flights = total_C$Total_Flights)
+flights_summary_city <- flights_summary_city %>% mutate(Percent_On_Time_city = Flights_On_Time/Total_Flights, Percent_Delayed_city = Flights_Delayed/Total_Flights)
+
+kable(flights_summary_city)
+```
+
+**Plot:**
+```{r}
+my.plot <- barplot(flights_summary_city$Total_Flights, main="Flights by Airline", xlab="Airline", names.arg=flights_summary_city$City, axes=FALSE, ylim = c(0, max(flights_summary_city$Total_Flights)+1000))
+# Placing values on top of bars
+text(my.plot, flights_summary_city$Total_Flights, labels = flights_summary_city$Total_Flights, pos = 3)
+```
+
+```{r}
+ggplot(flights_summary_city, aes(x = City, y = Percent_On_Time_city)) + geom_point(alpha = 0.5, size = 5, color = 'blue') +  labs(title ="cities on time ratio", x = "City", y = "Flights_On_Time_Percent")
+```
+
+```{r}
+ggplot(flights_summary_city, aes(x = City, y = Percent_Delayed_city)) + geom_point(alpha = 0.5, size = 5, color = 'blue') +  labs(title ="cities delayed ratio", x = "City", y = "Percent_Delayed")
+```
+
+#### (c) Joining tables with horizontal probabilities
+
+```{r}
+spread_data <-  flight %>% spread(Status, `Flight_Count`)
+```
+
+```{r}
+main_table <- spread_data %>% subset(select=c(Airline, City))
+airline_table <-  flights_summary_airline %>% subset(select=c(Airline,  Percent_Delayed_airline,Percent_On_Time_airline))
+city_table <-  flights_summary_city %>% subset(select=c(City, Percent_Delayed_city,Percent_On_Time_city))
+main_table <-  main_table %>% inner_join(airline_table, by="Airline" )
+main_table <-  main_table %>% inner_join(city_table, by="City" )
+kable(main_table)
+```
 
 
