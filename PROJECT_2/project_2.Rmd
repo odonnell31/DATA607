@@ -1,0 +1,276 @@
+---
+title: "PROJECT 2"
+author: "OMER OZEREN"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    highlight: tango
+    toc_depth: 5
+  word_document:
+    toc: yes
+    highlight: tango
+    toc_depth: 5
+---
+---
+Choose any of the three wide datasets identified in the week 6 discussion items. (You may choose your own)
+Read the information from your csv into R and use tidyR and dplyr as needed to transform the data. 
+Perform the analysis requested in the discussion item. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load Libraries:
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(RCurl)
+library(stringr)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(psych)
+library(knitr)
+```
+
+### GINI 
+
+Measuring the wealth distribution between the people in each country has been something economists have been measuring for many years. 
+In the GINI index, a higher GINI coefficient signifies inequality in wealth distribution, with 1 being complete inequality and 0 being complete equality.
+
+The World Bank has been maintaining this data.
+
+http://databank.worldbank.org/data/reports.aspx?source=2&series=SI.POV.GINI&country=#
+
+Import dataset from a .csv file.
+
+#### Data
+```{r}
+GINI.rawfile <- read.csv("https://raw.githubusercontent.com/omerozeren/DATA607/master/PROJECT_2/GINI.csv", header = TRUE)
+head(GINI.rawfile)
+```
+
+
+I notice that from the original data frame, there are columns: 1990, 2000, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016,2017,2018. I will use the gather() function from dplyr to 'tidy' up the data.
+
+```{r message=FALSE, warning=FALSE}
+#First,  will rename the columns so that it is easier to read.
+colnames(GINI.rawfile) <- c("Series.Name", "Series.Code", "Country.Name", "Country.Code", 1990, 2000,  2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016,2017,2018)
+# Then  will replace ".." with NA
+GINI.rawfile[GINI.rawfile == '..'] <- NA
+# Next  will gather the data and then eliminate the columns "Series.Name" and "Series.Code"
+GINI <- GINI.rawfile %>% gather(Year, GINI_Index, c(5:16), na.rm = TRUE) %>% group_by(Country.Name) %>% select(-c(Series.Name, Series.Code)) %>% arrange(Country.Name)
+#   must convert them into numbers so that we can perform calculations and statistical analysis. 
+GINI <- transform(GINI, GINI_Index = as.numeric(GINI_Index))
+head(GINI)
+```
+
+
+GINI is now formatted into a 'tidy' format that can now be utilized for analysis.
+
+According to the threat, an analysis that could be performed is the trend in the GINI coefficient for each country (or continent) or the average of the GINI coefficient. 
+
+Let's demonstrate the trend for the countries GINI coefficient scores.
+
+#### Selected countries trend 
+
+```{r warning=FALSE}
+GINI.subset <- GINI %>% filter(Country.Name %in% c('United States', 'Vietnam', 'Spain', 'United Kingdom', 'Turkmenistan', 'Russian Federation', 'Portugal', 'Mexico', 'China'))
+ggplot(GINI.subset, aes(x = Year, y = GINI_Index)) + geom_jitter(width = 0.5, height = 0.5, aes(color = as.factor(Country.Name))) + geom_line(aes(group = Country.Name), lty = 2, color = "blue") + labs(title = "Subset of Countries", x = "Year", y = "GINI Index") 
+```
+
+#### Entire countries trend
+
+```{r warning=FALSE}
+ggplot(GINI, aes(x = Year, y = GINI_Index)) + geom_jitter(width = 0.5, height = 0.5, aes(color = as.factor(Country.Name))) + geom_line(aes(group = Country.Name), lty = 2, color = "purple") + labs(title = "Entire Countries", x = "Year", y = "GINI Index") + theme(legend.position = "none")
+```
+
+#### Ranked average GINI Index 
+
+
+```{r}
+#  find the max and min of the country's GINI index by dplyr 
+par(mfrow = c(1,2))
+GINI.avg.per.country.order <- GINI %>% group_by(Country.Name) %>% summarise(AVG_GINI = mean(GINI_Index)) %>% arrange(AVG_GINI)
+head(GINI.avg.per.country.order)
+GINI.avg.per.country.order.max <- GINI.avg.per.country.order %>% arrange(desc(AVG_GINI))
+head(GINI.avg.per.country.order.max)
+```
+
+Interestingly, the top 6 counties with the worst GINI indices (higher the number, and hence, worse the inequality) are all in Africa, while the most of the top 6 countries with the best GINI indices are all in Eastern Europe. 
+
+```{r}
+GINI.avg.per.country <- GINI %>% group_by(Country.Name) %>% summarise(AVG_GINI = mean(GINI_Index))
+GINI.avg.per.country
+```
+
+#### Summary 
+```{r}
+GINI.stat <- describe(GINI.avg.per.country$AVG_GINI)
+GINI.qq <- summary(GINI.avg.per.country$AVG_GINI)
+GINI.stat
+GINI.qq
+```
+
+```{r}
+hist(GINI.avg.per.country$AVG_GINI, prob = TRUE, main = "GINI Average per Country", xlab = "GINI Index")
+x <- seq(20, 70, length = 10000)
+y <- dnorm(x, mean = GINI.stat$mean, sd = GINI.stat$sd)
+lines(x, y, type = 'l', lwd = 2, col = 'blue')
+```
+
+```{r}
+qqnorm(GINI.avg.per.country$AVG_GINI)
+qqline(GINI.avg.per.country$AVG_GINI)
+```
+
+```{r}
+# Let's find the GINI mean index value for United States
+United_States.GINI <- GINI.avg.per.country[GINI.avg.per.country$Country.Name == 'United States', 'AVG_GINI']
+paste0("United_States Average GINI index: ", round(United_States.GINI, 2))
+# Calculate the z-score and percentile.
+world.mean <- mean(GINI.avg.per.country$AVG_GINI,na.rm = T)
+United_States.Z <- (United_States.GINI - world.mean)/GINI.stat$sd
+United_States.prob <- pnorm(United_States.Z$AVG_GINI, mean = 0, sd = 1)
+paste("United States is", round(United_States.Z$AVG_GINI,2), "standard deviations away from the mean and is", round(United_States.prob, 2) * 100, "percentile.")
+```
+
+SUMMARY :
+The United Sates has balance out the wealth and equality . The United States is far only  0.3 standard deviation from world mean "GINI SCORE"  and it is  on 62 percentile.
+
+### POPULATION BY COUNTRY
+
+This data shows changes in population by counties  from 1960 to 2017. Here I'm going to define that there have been population shifts and I want to highlight some of them in my analysis in a very easy to read visualization.
+
+The World Bank has been maintaining this data.
+
+https://data.worldbank.org/indicator/sp.pop.totl
+
+Import dataset from a .csv file.
+
+#### Data
+```{r}
+population<- read.csv("https://raw.githubusercontent.com/omerozeren/DATA607/master/PROJECT_2/populationbycountry.csv", header = TRUE)
+head(population)
+```
+
+I want to remove Country.Names that actually not country such as 
+
+-North America
+-Central & South America
+-Antarctica
+-Eurasia
+-Middle East 
+-Asia & Oceania
+-World
+-Africa
+-Europe
+-Former Czechoslovakia
+-Former Serbia and Montenegro
+-Former Yugoslavia
+-East
+-Hawaiian Trade Zone
+-U.S. Pacific Islands
+-Wake Island
+-Former U.S.S.R.
+
+```{r}
+kable(head(population$Country.Name,10))
+```
+
+```{r}
+#Make a vector that lists all the countries that could not be classified by country code
+remove<- c('North America',
+           'Central & South America',
+           'Antarctica', 
+           'Eurasia', 
+           'Middle East', 
+           'Asia & Oceania', 
+           'World', 'Africa', 'Europe', 
+           'Former Czechoslovakia',
+           'Former Serbia and Montenegro',
+           'Former Yugoslavia', 
+           'East', 'Hawaiian Trade Zone',
+           'U.S. Pacific Islands', 'Wake Island', 'Former U.S.S.R.')
+df <- population[ !grepl(paste(remove, collapse="|"), population$Country.Name),]
+df <- data.frame(df)
+head(df)
+```
+
+I need to clean all of my year columns have an X in front of the name. We can use some regular expression to clean the column names. 
+```{r}
+#remove the x
+names(df) <- gsub(x = names(df), pattern = "\\X", replacement = "")  
+names(df)
+head(df, 2)
+```
+
+```{r}
+#Lets gather by key value pairs and create a new data frame 
+total_pop <- df %>% gather(data=df, Population, "1960":"2017")
+head(total_pop, 10)  
+tail(total_pop, 10)
+```
+
+I need to rename the year column 
+```{r}
+colnames(total_pop)[colnames(total_pop)=="."]<-"Year"
+names(total_pop)
+```
+
+removing the Na rows
+
+```{r}
+total_pop<-na.omit(total_pop)
+head(total_pop)
+```
+
+#### subset Population
+
+Creating Subset 
+```{r}
+df.Turkey<-subset(total_pop, Country.Name=='Turkey', select=c(Country.Name, Year, Population))
+head(df.Turkey, 30)
+```
+
+```{r}
+#Visualize the population
+ggplot(data=df.Turkey, aes(x=Year, y=Population, group=1)) +
+  geom_line(arrow = arrow())+
+  geom_point()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  labs( x="Year", y="Turkey population (In Millions)")
+```
+
+#### Entire country Population
+
+
+```{r}
+#Visualize the population
+ggplot(data=total_pop, aes(x=Year, y=Population, group=1)) +
+  geom_line(arrow = arrow())+
+  geom_point()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  labs( x="Year", y="World population (In Millions)")
+```
+
+#### Ranked average GINI Index 
+
+
+```{r}
+#  find the max and min of the country's GINI index by dplyr 
+par(mfrow = c(1,2))
+POP.avg.per.year.order <- total_pop %>% group_by('Year') %>% summarise(AVG_GINI = mean('POPULATION')) %>% arrange(AVG_GINI)
+head(GINI.avg.per.country.order)
+GINI.avg.per.country.order.max <- GINI.avg.per.country.order %>% arrange(desc(AVG_GINI))
+head(GINI.avg.per.country.order.max)
+```
+
+Interestingly, the top 6 counties with the worst GINI indices (higher the number, and hence, worse the inequality) are all in Africa, while the most of the top 6 countries with the best GINI indices are all in Eastern Europe. 
+
+```{r}
+GINI.avg.per.country <- GINI %>% group_by(Country.Name) %>% summarise(AVG_GINI = mean(GINI_Index))
+GINI.avg.per.country
+```
+
