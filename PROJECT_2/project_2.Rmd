@@ -363,9 +363,9 @@ paste("A number was drawn on average: ", Ball.stat)
 
 #### Summary 
 
-So at least from the histogram, the majority of the numbers appear to be drawn fairly evenly. But as you can see, ball 4 comes very often and ball 15 does not over the course of the 3 years. However, why does the number 4 occur so frequently and 15 so little? Is this variance or a statistical anomaly? 
+So at least from the histogram, the majority of the numbers appear to be drawn fairly evenly. But as you can see, ball 4 comes very often and ball 15 does not over the course of the 3 years. 
 
-We'll make a null and alternative hypothesis. Utilizing the 2 tailed p value test (using alpha = 0.05), we will determine if there is a statistical anomaly.
+I'll make a null and alternative hypothesis. Utilizing the 2 tailed p value test (using alpha = 0.05), we will determine if there is a statistical anomaly.
 
 The null hypothesis is that the number 4 and 15 are variance and are not statistical outliers. 
 
