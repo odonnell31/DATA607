@@ -54,6 +54,9 @@ head(GINI.rawfile)
 
 I notice that from the original data frame, there are columns: 1990, 2000, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016,2017,2018. I will use the gather() function from dplyr to 'tidy' up the data.
 
+
+#### Untidy Data
+
 ```{r message=FALSE, warning=FALSE}
 #First,  will rename the columns so that it is easier to read.
 colnames(GINI.rawfile) <- c("Series.Name", "Series.Code", "Country.Name", "Country.Code", 1990, 2000,  2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016,2017,2018)
@@ -73,7 +76,7 @@ According to the threat, an analysis that could be performed is the trend in the
 
 Let's demonstrate the trend for the countries GINI coefficient scores.
 
-#### Selected countries trend 
+#### Subset Data 
 
 ```{r warning=FALSE}
 GINI.subset <- GINI %>% filter(Country.Name %in% c('United States', 'Vietnam', 'Spain', 'United Kingdom', 'Turkmenistan', 'Russian Federation', 'Portugal', 'Mexico', 'China'))
@@ -87,7 +90,6 @@ ggplot(GINI, aes(x = Year, y = GINI_Index)) + geom_jitter(width = 0.5, height = 
 ```
 
 #### Ranked average GINI Index 
-
 
 ```{r}
 #  find the max and min of the country's GINI index by dplyr 
@@ -106,6 +108,7 @@ GINI.avg.per.country
 ```
 
 #### Summary 
+
 ```{r}
 GINI.stat <- describe(GINI.avg.per.country$AVG_GINI)
 GINI.qq <- summary(GINI.avg.per.country$AVG_GINI)
@@ -139,7 +142,7 @@ paste("United States is", round(United_States.Z$AVG_GINI,2), "standard deviation
 SUMMARY :
 The United Sates has balance out the wealth and equality . The United States is far only  0.3 standard deviation from world mean "GINI SCORE"  and it is  on 62 percentile.
 
-### POPULATION BY COUNTRY
+### POPULATION 
 
 This data shows changes in population by counties  from 1960 to 2017. Here I'm going to define that there have been population shifts and I want to highlight some of them in my analysis in a very easy to read visualization.
 
@@ -150,9 +153,10 @@ https://data.worldbank.org/indicator/sp.pop.totl
 Import dataset from a .csv file.
 
 #### Data
+
 ```{r}
 population<- read.csv("https://raw.githubusercontent.com/omerozeren/DATA607/master/PROJECT_2/populationbycountry.csv", header = TRUE)
-head(population)
+population[1:15, 1:5]
 ```
 
 I want to remove Country.Names that actually not country such as 
@@ -179,8 +183,9 @@ I want to remove Country.Names that actually not country such as
 kable(head(population$Country.Name,10))
 ```
 
+Make a vector that lists all the countries that could not be classified by country 
+
 ```{r}
-#Make a vector that lists all the countries that could not be classified by country code
 remove<- c('North America',
            'Central & South America',
            'Antarctica', 
@@ -192,19 +197,27 @@ remove<- c('North America',
            'Former Serbia and Montenegro',
            'Former Yugoslavia', 
            'East', 'Hawaiian Trade Zone',
-           'U.S. Pacific Islands', 'Wake Island', 'Former U.S.S.R.')
+           'U.S. Pacific Islands', 'Wake Island', 'Former U.S.S.R.',
+           'IDA & IBRD total','Low & middle income',
+'Middle income','IBRD only','Early-demographic dividend','Upper middle income','Lower middle income',',Late-demographic dividend',
+'South Asia','South Asia (IDA & IBRD)','OECD members','High income','Post-demographic dividend','IDA total','IDA only',
+'Least developed countries: UN classification','Pre-demographic dividend','Latin America & Caribbean','Latin America & the Caribbean (IDA & IBRD countries)','Heavily indebted poor countries (HIPC)',
+'Low income','Latin America & Caribbean (excluding high income)','Euro area','IDA blend','Fragile and conflict affected situations','Late-demographic dividend',
+'Latin America & the Caribbean (IDA & IBRD countries)','Heavily indebted poor countries (HIPC)','Latin America & the Caribbean (IDA & IBRD countries)','Heavily indebted poor countries (HIPC)')
 df <- population[ !grepl(paste(remove, collapse="|"), population$Country.Name),]
 df <- data.frame(df)
 head(df)
 ```
 
 I need to clean all of my year columns have an X in front of the name. We can use some regular expression to clean the column names. 
+
 ```{r}
 #remove the x
 names(df) <- gsub(x = names(df), pattern = "\\X", replacement = "")  
 names(df)
 head(df, 2)
 ```
+
 
 ```{r}
 #Lets gather by key value pairs and create a new data frame 
@@ -226,7 +239,9 @@ total_pop<-na.omit(total_pop)
 head(total_pop)
 ```
 
-#### subset Population
+#### Subset Population
+
+In subset population data, I choose Turkey to see how population is look like.
 
 Creating Subset 
 ```{r}
@@ -245,7 +260,6 @@ ggplot(data=df.Turkey, aes(x=Year, y=Population, group=1)) +
 
 #### Entire country Population
 
-
 ```{r}
 #Visualize the population
 ggplot(data=total_pop, aes(x=Year, y=Population, group=1)) +
@@ -255,22 +269,123 @@ ggplot(data=total_pop, aes(x=Year, y=Population, group=1)) +
   labs( x="Year", y="World population (In Millions)")
 ```
 
-#### Ranked average GINI Index 
-
+#### Untidy Data 
 
 ```{r}
-#  find the max and min of the country's GINI index by dplyr 
+#  find the max and min of the country's Population index by dplyr 
 par(mfrow = c(1,2))
-POP.avg.per.year.order <- total_pop %>% group_by('Year') %>% summarise(AVG_GINI = mean('POPULATION')) %>% arrange(AVG_GINI)
-head(GINI.avg.per.country.order)
-GINI.avg.per.country.order.max <- GINI.avg.per.country.order %>% arrange(desc(AVG_GINI))
-head(GINI.avg.per.country.order.max)
+POP.avg.per.country.order <- total_pop %>% group_by(Year)  %>% group_by(Country.Name) %>% summarise(AVG_POP = mean(Population,na.rm=TRUE))%>% arrange(AVG_POP)
+head(POP.avg.per.country.order)
+POP.avg.per.country.order.max <- POP.avg.per.country.order %>% arrange(desc(AVG_POP))
+head(POP.avg.per.country.order.max)
 ```
 
-Interestingly, the top 6 counties with the worst GINI indices (higher the number, and hence, worse the inequality) are all in Africa, while the most of the top 6 countries with the best GINI indices are all in Eastern Europe. 
+#### Summary 
 
 ```{r}
-GINI.avg.per.country <- GINI %>% group_by(Country.Name) %>% summarise(AVG_GINI = mean(GINI_Index))
-GINI.avg.per.country
+POP.stat <- describe(POP.avg.per.country.order.max$AVG_POP)
+POP.qq <- summary(POP.avg.per.country.order.max$AVG_POP)
+(POP.stat)
+POP.qq
 ```
+
+```{r}
+hist(POP.avg.per.country.order.max$AVG_POP, prob = TRUE, main = "Average Population per Country", xlab = "AVG POP")
+y <- dnorm(x, mean = POP.stat$mean, sd = POP.stat$sd)
+lines(x, y, type = 'l', lwd = 2, col = 'blue')
+```
+
+The summary table shows that the average min population is 8567.5 and average maximum poulation is 422187266. The country that has maximun average population is China and second is India so on.
+
+
+### LOTTERY
+
+The New York State Government keeps track of all the drawn winning numbers. This database contains information from June 2014 to March 2019.
+
+Defination :  Each game costs $2. Players choose (or have the terminal select the numbers, which is known as "quick pick" in Maryland, New Jersey, New York, Pennsylvania, and Tennessee; and "easy pick" in Virginia) 5 of 60 numbers in the main field, and 1 of 4 (hence the game's name) green "Cash Ball" numbers in a second field. Matching all six numbers wins, or shares ("split-prize liability").
+
+Source : https://en.wikipedia.org/wiki/New_York_Lottery
+
+
+#### Data
+
+```{r}
+# Reading the .csv file from my github page
+lottery <- read.csv("https://raw.githubusercontent.com/omerozeren/DATA607/master/PROJECT_2/LOTTERY.csv", header = TRUE)
+# This shows the first 6 rows of this data.frame
+head(lottery)
+```
+
+
+#### Untidy Data
+
+```{r}
+# We will separate all the winning numbers and create separate columns i.e. in row 1, Ball 1: 09, Ball 2: 36, Ball 3: 44, Ball 4: 53, Ball 5: 59
+lottery.separated <- unlist(str_extract_all(lottery$Winning.Numbers, "(\\d)."))
+lottery.separated <- as.numeric(lottery.separated)
+lottery2 <- matrix(lottery.separated, ncol = 5, byrow = TRUE)
+lottery2 <- as.data.frame(lottery2)
+lottery.untidy <- data.frame(lottery$Draw.Date, lottery2, lottery$Cash.Ball)
+colnames(lottery.untidy) <- c("Draw.Date", 1, 2, 3, 4, 5, "Cash.Ball")
+# As you can see, this separated all the numbers into its own fields
+head(lottery.untidy)
+```
+
+So now we have created an untidy data frame with all of the Cash 4 Life Winning Numbers. We will now utilize dplyr and tidyr to 'tidy' up the data. 
+
+```{r}
+lottery.tidy <- lottery.untidy %>% gather(BallOrder, Number, 2:6) %>% select(-Cash.Ball)
+head(lottery.tidy)
+```
+
+Next, I would liket to see 1. What is the most frequent ball to show up? 2. What is the least frequent ball to show up?
+
+```{r}
+hist(lottery.tidy$Number, breaks = 60, main = "Number Drawn", xlab = "Ball Number", ylim = c(0,40), col = 'lightblue')
+Ball.Num <- as.numeric(lottery.tidy$Number)
+Ball.Num <- as.data.frame(table(Ball.Num))
+head(Ball.Num)
+```
+
+Now with the frequency calculated for each number of ball. Let's find out some more information about these ball numbers.
+
+```{r}
+Freq.Drawn <- Ball.Num %>% arrange(desc(Freq))
+Freq.Drawn
+paste("The Most Drawn Ball is: ", Freq.Drawn$Ball.Num[1])
+paste("The Least Drawn Ball is: ", Freq.Drawn$Ball.Num[length(Freq.Drawn$Ball.Num)])
+Ball.stat <- Freq.Drawn %>% summarise(Mean= mean(Freq))
+Ball.stat <- as.numeric(Ball.stat)
+paste("A number was drawn on average: ", Ball.stat)
+```
+
+
+#### Summary 
+
+So at least from the histogram, the majority of the numbers appear to be drawn fairly evenly. But as you can see, ball 4 comes very often and ball 15 does not over the course of the 3 years. However, why does the number 4 occur so frequently and 15 so little? Is this variance or a statistical anomaly? 
+
+We'll make a null and alternative hypothesis. Utilizing the 2 tailed p value test (using alpha = 0.05), we will determine if there is a statistical anomaly.
+
+The null hypothesis is that the number 4 and 15 are variance and are not statistical outliers. 
+
+The alternative hypothesis is that the NY State Lottery system is rigged and weighs number 4 and 15 differently from the rest of the numbers.
+
+```{r}
+# Calculating the standard deviation, which we will use to calculate the Z-score
+Ball.sd <- sd(Freq.Drawn$Freq)
+# The Z-score is obtained and coverted into a two-taled p value Z.4.p
+Z.4 <- (60 - Ball.stat)/Ball.sd
+Z.4 <- pnorm(Z.4, mean = 0, sd = 1)
+Z.4.p <- (1 - Z.4) * 2
+# Again, the same process takes place here, except that this time, it is for ball 42
+Z.15 <- (9 - Ball.stat)/Ball.sd
+Z.15 <- pnorm(Z.15, mean = 0, sd = 1)
+Z.15.p <- (Z.15) * 2
+paste("The P-value for Ball 4: ", Z.4.p)
+paste("The P-value for Ball 15: ", Z.15.p)
+```
+
+Both these values are less than alpha = 0.05, thus making them statistically significant. Now does this actually mean that the NYS Lottery System is rigged? The numbers make a strong case for rejecting the null hypothesis.
+
+Even though the p-values suggest that we reject the null hypothesis, we have to remember that this lottery has only been played 494 times since June 2014.That truelly means that our analysis is based on only 494 data points so conclusion might not be accurate.
 
