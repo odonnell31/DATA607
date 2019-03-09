@@ -304,8 +304,9 @@ The New York State Government keeps track of all the drawn winning numbers. This
 
 Defination :  Each game costs $2. Players choose (or have the terminal select the numbers, which is known as "quick pick" in Maryland, New Jersey, New York, Pennsylvania, and Tennessee; and "easy pick" in Virginia) 5 of 60 numbers in the main field, and 1 of 4 (hence the game's name) green "Cash Ball" numbers in a second field. Matching all six numbers wins, or shares ("split-prize liability").
 
-Source : https://en.wikipedia.org/wiki/New_York_Lottery
+Source Defination : https://en.wikipedia.org/wiki/New_York_Lottery
 
+Data Source : https://data.ny.gov/Government-Finance/Lottery-Cash-4-Life-Winning-Numbers-Beginning-2014/kwxv-fwze
 
 #### Data
 
