@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<top_three_books>
+    <book id="1">
+        <title>Deep Learning</title>
+        <year>2015</year>
+        <isbn>978-0739435571</isbn>  
+        <author>Ian Goodfellow</author>  
+        <publisher>MIT Press</publisher>     
+    </book>
+    <book id="2">
+        <title>Pattern Recognition and Machine Learning</title>
+        <year>2017</year>
+        <isbn>978-0060883287</isbn>  
+        <author>Mark Bishop</author>  
+        <publisher>Cambridge University Press</publisher> 
+    </book>
+    <book id="3">
+        <title>Financial Time Series</title>
+        <year>2008</year>
+        <isbn>978-0131103627</isbn>  
+        <author>Jack Tsay</author>  
+        <publisher>World Scientific Publishing Co</publisher>        
+    </book>
+</top_three_books>
