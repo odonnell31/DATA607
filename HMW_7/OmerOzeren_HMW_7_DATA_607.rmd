@@ -1,0 +1,110 @@
+---
+title: "Homework 7"
+author: "OMER OZEREN"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    highlight: tango
+    toc_depth: 5
+  word_document:
+    toc: yes
+    highlight: tango
+    toc_depth: 5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Assignment
+Working with HTML, XML and JSON in R
+
+Pick three of your favorite books on one of your favorite subjects. At least one of the books should have more than one author. For each book, include the title, authors, and two or three other attributes that you find interesting.
+
+Take the information that you've selected about these three books, and separately create three files which store the book's information in HTML (using an html table), XML, and JSON formats (e.g. "book.html", "book.xml", and "book.json"). To help you better understand the different file structures, I'd prefer that you create each of these files "by hand" unless you're already very comfortable with the file formats.
+
+References to the books.html, books.xml, and books.json.
+
+books.html: https://raw.githubusercontent.com/omerozeren/DATA607/master/HMW_7/books.html
+
+books.xml: https://raw.githubusercontent.com/omerozeren/DATA607/master/HMW_7/books.xml
+
+books.jason: https://raw.githubusercontent.com/omerozeren/DATA607/master/HMW_7/books.json
+
+
+Load libraries:
+
+```{r message=FALSE, warning=FALSE}
+library(RCurl)
+library(XML)
+library(jsonlite)
+library(data.table)
+```
+
+### HTML
+
+#### Import HTML file
+
+```{r}
+html_url  <- "https://raw.githubusercontent.com/omerozeren/DATA607/master/HMW_7/books.html"
+html_file <- getURL(html_url)
+```
+
+#### Parsing the data
+```{r}
+html_file <- htmlParse(html_file)
+```
+
+#### Converting into a data.frame
+```{r}
+html_df <- as.data.frame(readHTMLTable(html_file))
+html_df
+```
+
+### XML
+
+#### Import XML file
+
+```{r}
+xml_url <- "https://raw.githubusercontent.com/omerozeren/DATA607/master/HMW_7/books.xml"
+xml_file <- getURL(xml_url)
+```
+
+#### Parsing the data
+```{r}
+xml_file <- xmlParse(xml_file)
+```
+
+
+#### Converting into a data.frame
+
+```{r}
+part_1 <- xmlRoot(xml_file)
+xml_df <- xmlToDataFrame(part_1)
+xml_df
+```
+
+### JSON
+
+#### Import JSON file
+
+```{r}
+json_url <- "https://raw.githubusercontent.com/omerozeren/DATA607/master/HMW_7/books.json"
+json_file <- getURL(json_url)
+```
+
+#### Parsing the data
+```{r}
+json_file <- fromJSON(json_file)
+```
+
+#### Converting into a data.frame
+
+```{r}
+json_file_df <- as.data.frame(json_file)
+json_file_df
+```
+
+
