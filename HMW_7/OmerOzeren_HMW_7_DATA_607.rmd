@@ -107,4 +107,20 @@ json_file_df <- as.data.frame(json_file)
 json_file_df
 ```
 
+### Are the three data frames identical?
 
+We can look at the structures of each data.frame to see if they are identical.
+
+```{r}
+str(html_df)
+```
+
+```{r}
+str(xml_df)
+```
+
+```{r}
+str(json_file_df)
+```
+
+After looking at the structures, the HTML and XML data.frame looks identical to each other (other than the names of the headers i.e. Null.Book.Name vs. Book_Name). They are all listed as factors with multiple levels, whereas, the JSON data frame uses chr, int in their data.frame.
