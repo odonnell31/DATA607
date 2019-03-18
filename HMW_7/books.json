@@ -1,0 +1,23 @@
+{"top_three_books" : [
+    {
+    "title" : "Deep Learning",
+    "year" : "2015",
+    "isbn" : "978-0739435571",
+    "author" : "Ian Goodfellow",
+    "publisher" : "MIT Press"
+    },
+    {
+    "title" : "attern Recognition and Machine Learning",
+    "year" : "2017",
+    "isbn" : "978-0060883287",
+    "author" : "Mark Bishop",
+    "publisher" : "Cambridge University Press"
+    },
+    {
+    "title" : "Financial Time Series",
+    "year" : "2008",
+    "isbn" : "978-0131103627",
+    "author" : "Jack Tsay",
+    "publisher" : "World Scientific Publishing Co"
+    }]
+}
