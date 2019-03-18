@@ -3,13 +3,13 @@ title: "Homework 7"
 author: "OMER OZEREN"
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
+  word_document:
+    toc: yes
+    highlight: tango
+    toc_depth: 5
   html_document:
     toc: yes
     toc_float: yes
-    highlight: tango
-    toc_depth: 5
-  word_document:
-    toc: yes
     highlight: tango
     toc_depth: 5
 ---

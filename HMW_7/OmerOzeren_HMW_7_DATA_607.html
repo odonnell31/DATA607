@@ -408,6 +408,61 @@ xml_df</code></pre></div>
 ## 3      Jack Tsay World Scientific Publishing Co</code></pre>
 </div>
 </div>
+<div id="json" class="section level3">
+<h3>JSON</h3>
+<div id="import-json-file" class="section level4">
+<h4>Import JSON file</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">json_url &lt;-<span class="st"> &quot;https://raw.githubusercontent.com/omerozeren/DATA607/master/HMW_7/books.json&quot;</span>
+json_file &lt;-<span class="st"> </span><span class="kw">getURL</span>(json_url)</code></pre></div>
+</div>
+<div id="parsing-the-data-2" class="section level4">
+<h4>Parsing the data</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">json_file &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(json_file)</code></pre></div>
+</div>
+<div id="converting-into-a-data.frame-2" class="section level4">
+<h4>Converting into a data.frame</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">json_file_df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(json_file)
+json_file_df</code></pre></div>
+<pre><code>##                     top_three_books.title top_three_books.year
+## 1                           Deep Learning                 2015
+## 2 attern Recognition and Machine Learning                 2017
+## 3                   Financial Time Series                 2008
+##   top_three_books.isbn top_three_books.author
+## 1       978-0739435571         Ian Goodfellow
+## 2       978-0060883287            Mark Bishop
+## 3       978-0131103627              Jack Tsay
+##        top_three_books.publisher
+## 1                      MIT Press
+## 2     Cambridge University Press
+## 3 World Scientific Publishing Co</code></pre>
+</div>
+</div>
+<div id="are-the-three-data-frames-identical" class="section level3">
+<h3>Are the three data frames identical?</h3>
+<p>We can look at the structures of each data.frame to see if they are identical.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(html_df)</code></pre></div>
+<pre><code>## 'data.frame':    3 obs. of  5 variables:
+##  $ X.Top.three.books..Book.Title: Factor w/ 3 levels &quot;Deep Learning&quot;,..: 1 3 2
+##  $ X.Top.three.books..Year      : Factor w/ 3 levels &quot;2008&quot;,&quot;2015&quot;,..: 2 3 1
+##  $ X.Top.three.books..ISBN      : Factor w/ 3 levels &quot;978-0060883287&quot;,..: 3 1 2
+##  $ X.Top.three.books..Author    : Factor w/ 3 levels &quot;Ian Goodfellow&quot;,..: 1 3 2
+##  $ X.Top.three.books..Publisher : Factor w/ 3 levels &quot;Cambridge University Press&quot;,..: 2 1 3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(xml_df)</code></pre></div>
+<pre><code>## 'data.frame':    3 obs. of  5 variables:
+##  $ title    : Factor w/ 3 levels &quot;Deep Learning&quot;,..: 1 3 2
+##  $ year     : Factor w/ 3 levels &quot;2008&quot;,&quot;2015&quot;,..: 2 3 1
+##  $ isbn     : Factor w/ 3 levels &quot;978-0060883287&quot;,..: 3 1 2
+##  $ author   : Factor w/ 3 levels &quot;Ian Goodfellow&quot;,..: 1 3 2
+##  $ publisher: Factor w/ 3 levels &quot;Cambridge University Press&quot;,..: 2 1 3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(json_file_df)</code></pre></div>
+<pre><code>## 'data.frame':    3 obs. of  5 variables:
+##  $ top_three_books.title    : chr  &quot;Deep Learning&quot; &quot;attern Recognition and Machine Learning&quot; &quot;Financial Time Series&quot;
+##  $ top_three_books.year     : chr  &quot;2015&quot; &quot;2017&quot; &quot;2008&quot;
+##  $ top_three_books.isbn     : chr  &quot;978-0739435571&quot; &quot;978-0060883287&quot; &quot;978-0131103627&quot;
+##  $ top_three_books.author   : chr  &quot;Ian Goodfellow&quot; &quot;Mark Bishop&quot; &quot;Jack Tsay&quot;
+##  $ top_three_books.publisher: chr  &quot;MIT Press&quot; &quot;Cambridge University Press&quot; &quot;World Scientific Publishing Co&quot;</code></pre>
+<p>After looking at the structures, the HTML and XML data.frame looks identical to each other (other than the names of the headers i.e. Null.Book.Name vs. Book_Name). They are all listed as factors with multiple levels, whereas, the JSON data frame uses chr, int in their data.frame.</p>
+</div>
 
 
 
