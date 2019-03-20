@@ -105,3 +105,7 @@ for (city in cities){
 }
 
 write.csv(jobs.data, file = "C:/Users/OMERO/Documents/GitHub/Data607/PROJECT_3/Indeed_Job_Search.csv")
+
+url <- "https://raw.githubusercontent.com/omerozeren/DATA607/master/PROJECT_3/Indeed_Job_Search.csv"
+df <- read.csv(url)
+df

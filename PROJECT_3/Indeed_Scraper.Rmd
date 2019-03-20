@@ -1,7 +1,9 @@
 ---
 title: "Indeed Scraper"
-Author: "OMER OZEREN"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
+Author: OMER OZEREN
 ---
 
 
@@ -116,3 +118,22 @@ for (city in cities){
 ```{r eval=TRUE}
 write.csv(jobs.data, file = "C:/Users/OMERO/Documents/GitHub/Data607/PROJECT_3/Indeed_Job_Search.csv")
 ```
+
+#Reading the data
+```{r eval=TRUE}
+url <- "https://raw.githubusercontent.com/omerozeren/DATA607/master/PROJECT_3/Indeed_Job_Search.csv"
+df <- read.csv(url)
+df
+```
+
+
+
+
+
+
+
+
+
+
+
+
