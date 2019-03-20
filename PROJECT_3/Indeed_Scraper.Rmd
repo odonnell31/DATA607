@@ -26,34 +26,40 @@ cities <- c("New+York+NY", "Seattle+WA", "San+Francisco+CA",
 target.job <- "data+scientist"   
 base.url <- "https://www.indeed.com/"
 max.results <- 100
-```
 
-```{r eval=TRUE}
 #create a df to hold everything that we collect
-jobs.data <- data.frame(matrix(ncol = 7, nrow = 0))
-n <- c("city","job.title","company.name","job.location","summary.short","salary","links,summary.full")
-colnames(jobs.data) <- n
+jobs.data <- data.frame(matrix(ncol = 4, nrow = 0))
+n <- c("city","job.title","company.name","description")
+colnames(jobs.data)<-n
+
+
+
+#Havesting data for all the cities and begin to parse the results with xpaths to extract interesting information 
 for (city in cities){
   print(paste("Downloading data for: ", city))
   
-  # I'm going only 10 pages
+  
   for (start in range(0,max.results,10)){
+    
     url <- paste(base.url,"jobs?q=",target.job,"&l=",city,"&start=", start ,sep="")
     page <- read_html(url)
     Sys.sleep(1)
-  
-    #recored the city search term << not working yet...
-    #i<-i+1
-    #job.city[i] <- city
-  
+    
+    
+    
     #get the links
     links <- page %>% 
       html_nodes("div") %>%
       html_nodes(xpath = '//*[@data-tn-element="jobTitle"]') %>%
       html_attr("href")
     
-
-  
+    
+    #get the job title
+    job.title <- page %>% 
+      html_nodes("div") %>%
+      html_nodes(xpath = '//*[@data-tn-element="jobTitle"]') %>%
+      html_attr("title")
+    
     #get the job title
     job.title <- page %>% 
       html_nodes("div") %>%
@@ -66,31 +72,23 @@ for (city in cities){
       html_nodes(xpath = '//*[@class="company"]')  %>% 
       html_text() %>%
       trimws -> company.name 
-  
-    #get job location
-    job.location <- page %>% 
-      html_nodes("span") %>% 
-      html_nodes(xpath = '//*[@class="location"]')%>% 
-      html_text() %>%
-      trimws -> job.location
     
-    #get the short summary
-    summary.short <- page %>% 
+    
+    #get the description
+    description <- page %>% 
       html_nodes("span")  %>% 
       html_nodes(xpath = '//*[@class="summary"]')  %>% 
       html_text() %>%
-      trimws -> summary.short 
+      trimws -> description
     
   }
   
-  #create a structure to hold our full summaries
-  summary.full <- rep(NA, length(links))
+
   
   #fill in the job data
   job.city <- rep(city,length(links))
   
-  #add a place-holder for the salary
-  job.salary <- rep(0,length(links))
+
   
   #iterate over the links that we collected
   for ( n in 1:length(links) ){
@@ -100,36 +98,21 @@ for (city in cities){
     
     #pull the link
     page <- read_html(link)
-  
-    #get the full summary
-    s.full <- page %>%
-     html_nodes("span")  %>% 
-     html_nodes(xpath = '//*[@class="summary"]') %>% 
-     html_text() %>%
-     trimws -> s.full
-  
-    #check to make sure we got some data and if so, append it.
-    #as expired postings return an empty var
-    if (length(s.full) > 0 ){
-        summary.full[n] = s.full  
-        } 
-  
-    }
-  
-    #add the newly collected data to the jobs.data
-    jobs.data <- rbind(jobs.data,data.frame(city,
-                                            job.title,
-                                            company.name,
-                                            job.location,
-                                            summary.short,
-                                            job.salary,
-                                            links,
-                                            summary.full))
     
- 
+
+    
+  }
+  
+  #add the newly collected data to the jobs.data
+  jobs.data <- rbind(jobs.data,data.frame(city,
+                                          job.title,
+                                          company.name,
+                                          description))
+  
+  
 }
 ```
 
 ```{r eval=TRUE}
-write.csv(jobs.data, file = "MyData.csv")
+write.csv(jobs.data, file = "C:/Users/OMERO/Documents/GitHub/Data607/PROJECT_3/Indeed_Job_Search.csv")
 ```
