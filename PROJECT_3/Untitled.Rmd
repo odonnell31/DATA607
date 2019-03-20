@@ -1,24 +1,9 @@
 ---
 title: "Indeed Scraper"
-Author: "Group Rouge"
+Author: "OMER OZEREN"
 output: html_notebook
 ---
 
-
-```{r echo=FALSE}
-rm(list = ls())
-```
-
-
-# Overview:
-
-The following chunk of code scrapes job postings from indeed.com and collects the results into a dataframe.  It's a port from some python code originally used to scrape our data set.
-
-#### Important!
-
-This scraper is working code, however, we've diabled here as it can take a while to run.  It's provided as a working demonstration of how our data was collected.  All subsequent work for this project was completed on a static data set which we collected & crystallized early on in our efforts.  This was done to ensure that all group members were always working with identical data and that any user could re-produce our results after the fact,  as desired. 
-
-If you would like to see it in action, set {r eval=FALSE} to TRUE.
 
 
 ## Load the libraries:
@@ -34,34 +19,24 @@ library(RCurl)
 First we'll set a few variables that we'll use in our scraping activity.  I've used a smaller set of cities as we'll probably just use this to demonstrate how it works.
 
 ```{r eval=TRUE}
-city.set_small <- c("New+York+NY", "Seattle+WA")
-city.set <- c("New+York+NY", "Seattle+WA", "San+Francisco+CA",
-              "Washington+DC","Atlanta+GA","Boston+MA", "Austin+TX",
-              "Cincinnati+OH", "Pittsburgh+PA")
+
+cities <- c("New+York+NY", "Seattle+WA", "San+Francisco+CA",
+            "Washington+DC","Atlanta+GA","Boston+MA", "Austin+TX",
+            "Los+Angeles+CA")
 target.job <- "data+scientist"   
 base.url <- "https://www.indeed.com/"
-max.results <- 50
+max.results <- 100
 ```
-
-
-## Scrape the Details & Get the Full Summary
-
-#### Getting the Details
-
-Indeed.com appears to use the "GET" request method, so we can directly mess around with the URL to get the data that we want.  We're going to iterate over our target cities and scrape the particulars for each job - this includes getting the links to each individual job-page so that we can also pull the full summary
-
-#### Getting the full Summary
-
-After the above is complete, we're going to iterate over all the links that we've collected, pull them, and grab the full job summary for each.  Note that it appears that jobs postings are sometimes removed, in which case, we pull an empty variable.  We could probably do some cleaning in this step while downloading, but we're going to handle that downstream.
 
 ```{r eval=TRUE}
 #create a df to hold everything that we collect
 jobs.data <- data.frame(matrix(ncol = 7, nrow = 0))
 n <- c("city","job.title","company.name","job.location","summary.short","salary","links,summary.full")
 colnames(jobs.data) <- n
-for (city in city.set_small){
+for (city in cities){
   print(paste("Downloading data for: ", city))
   
+  # I'm going only 10 pages
   for (start in range(0,max.results,10)){
     url <- paste(base.url,"jobs?q=",target.job,"&l=",city,"&start=", start ,sep="")
     page <- read_html(url)
@@ -77,12 +52,7 @@ for (city in city.set_small){
       html_nodes(xpath = '//*[@data-tn-element="jobTitle"]') %>%
       html_attr("href")
     
-  
-    #get the job title
-    job.title <- page %>% 
-      html_nodes("div") %>%
-      html_nodes(xpath = '//*[@data-tn-element="jobTitle"]') %>%
-      html_attr("title")
+
   
     #get the job title
     job.title <- page %>% 
@@ -104,7 +74,7 @@ for (city in city.set_small){
       html_text() %>%
       trimws -> job.location
     
-    #get the short sumary
+    #get the short summary
     summary.short <- page %>% 
       html_nodes("span")  %>% 
       html_nodes(xpath = '//*[@class="summary"]')  %>% 
@@ -158,4 +128,8 @@ for (city in city.set_small){
     
  
 }
+```
+
+```{r eval=TRUE}
+write.csv(jobs.data, file = "MyData.csv")
 ```
